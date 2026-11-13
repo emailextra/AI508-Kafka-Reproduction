@@ -1,0 +1,1 @@
+{"records": 6000, "bytes": 6144000, "seconds": 0.280007299996214, "cpu_percent": 70.2, "ram_percent": 62.4, "disk_read_bytes": 61440, "disk_write_bytes": 36864, "experiment": "001", "algorithm": "BroMin", "replicas": 5, "consumers": 5, "size": 1024, "producers": 0, "partitions": 40, "brokers": 5, "repeat": 1, "trace": "ai508-1-12110fb1.csv.gz", "produced": 12000}

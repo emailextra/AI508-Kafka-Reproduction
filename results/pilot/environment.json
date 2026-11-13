@@ -1,0 +1,12 @@
+{
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14",
+  "logical_cpus": 8,
+  "physical_cpus": 4,
+  "ram_bytes": 17018515456,
+  "kafka": "3.4.1",
+  "confluent_kafka": "2.16.1",
+  "java": "jdk-17.0.21+9",
+  "timestamp_utc": "2026-11-11T07:37:43Z",
+  "upstream_commit": "19e9874c9414ceb1c036f856f1297a84e82ea4f3"
+}

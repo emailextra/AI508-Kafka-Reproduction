@@ -1,0 +1,11 @@
+test_broMax (test_algorithms.TestConf.test_broMax) ... ok
+test_broMin (test_algorithms.TestConf.test_broMin) ... ok
+test_check_feasible (test_algorithms.TestConf.test_check_feasible) ... ok
+test_maxP (test_algorithms.TestConf.test_maxP) ... ok
+test_minP (test_algorithms.TestConf.test_minP) ... ok
+test_solve (test_algorithms.TestConf.test_solve) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.056s
+
+OK
