@@ -57,3 +57,20 @@ Run the larger-preload Experiment 001 matrix with:
 Use the second command once all 72 longer-preload trials have completed. Experiment 003 continues to use the original latency traces.
 
 The packaged results/throughput-long folder contains 7 completed follow-up trials and the recorded preload failure. These partial results are diagnostic and are excluded from the main comparisons.
+
+## Additional validation
+
+Run the independent six-broker feasibility sweep and the archived trial sensitivity check from the project root:
+
+```powershell
+& $python reproduction/b6_feasibility.py
+& $python reproduction/trial_stats.py
+```
+
+The scripts read the original calibration, throughput archive summaries, and live record traces. They write results/b6-calibration.csv and results/trial-sensitivity.json. The feasibility sweep uses the original consumer grid of 25–125 in steps of five. The six-broker throughput comparison holds replication factor, consumer count, and payload size fixed. The initial 20,000-record preload timed out. The supported rerun uses 6,000 records and a 10 ms producer linger during preload. Its evidence is in results/fixed-brokers-retry:
+
+```powershell
+& $python reproduction/benchmark.py --fixed-brokers --name fixed-brokers
+```
+
+Use a fresh run name for an independent attempt or --resume to continue an incomplete run with its original name and options.

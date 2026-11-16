@@ -106,9 +106,10 @@ def create_topic(admin, topic, partitions, replicas):
     raise RuntimeError(f"Topic {topic} did not reach full replication")
 
 
-def send_records(bootstrap, topic, count, min_bytes, max_bytes, seed, rate=0, start=None, timeout_ms=30000):
+def send_records(bootstrap, topic, count, min_bytes, max_bytes, seed, rate=0, start=None,
+                 timeout_ms=30000, linger_ms=0):
     producer = Producer({"bootstrap.servers": bootstrap, "acks": "all",
-                         "linger.ms": 0, "compression.type": "none",
+                         "linger.ms": linger_ms, "compression.type": "none",
                          "message.timeout.ms": timeout_ms})
     errors = []
     rng = random.Random(seed)
@@ -235,8 +236,10 @@ def trial(bootstrap, admin, scenario, folder, sequence, long_throughput=False):
     seed = 20261111 + repeat
     if experiment == "001":
         preloads = {1024: 250000, 102400: 20000} if long_throughput else {1024: 12000, 102400: 2400}
-        records = preloads[size]
-        send_records(bootstrap, topic, records, size, size, seed, timeout_ms=180000 if long_throughput else 30000)
+        records = 6000 if algo == "FixedBrokers" else preloads[size]
+        send_records(bootstrap, topic, records, size, size, seed,
+                     timeout_ms=120000 if algo == "FixedBrokers" else (180000 if long_throughput else 30000),
+                     linger_ms=10 if algo == "FixedBrokers" else 0)
         feed = None
         expected = records // 2
     else:
@@ -263,6 +266,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--long-throughput", action="store_true")
+    parser.add_argument("--fixed-brokers", action="store_true",
+                        help="Compare 40 and 80 partitions on six brokers using larger preloads")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--name", default="live")
     parser.add_argument("--resume", action="store_true")
@@ -294,6 +299,9 @@ def main():
                 scenarios.append(("003", algo, 3, 5, 0, producers, p, b, rep))
     if options.long_throughput:
         scenarios = [scenario for scenario in scenarios if scenario[0] == "001"]
+    if options.fixed_brokers:
+        scenarios = [("001", "FixedBrokers", 3, 10, 102400, 0, partitions, 6, repeat)
+                     for repeat in range(1, options.repeats + 1) for partitions in (40, 80)]
     if options.pilot:
         scenarios = [("001", "BroMin", 5, 5, 1024, 0, 40, 5, 1)]
     order = random.Random(508)
@@ -321,7 +329,8 @@ def main():
                 for sequence, scenario in pending:
                     print(f"Starting {sequence}/{len(scenarios)} {scenario}", flush=True)
                     try:
-                        result = trial(bootstrap, admin, scenario, folder, sequence, options.long_throughput)
+                        result = trial(bootstrap, admin, scenario, folder, sequence,
+                                       options.long_throughput or options.fixed_brokers)
                     except Exception as exc:
                         result = {"scenario": scenario, "error": repr(exc)}
                         output.write(json.dumps(result) + "\n")
